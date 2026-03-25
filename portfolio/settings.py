@@ -10,15 +10,14 @@ SECRET_KEY = os.getenv(
     'django-insecure-oqc*(q@xry$+wtc7i+mq0dya6eo*16d8kct%i&oa2h^$l*jbpw'
 )
 
-DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1', 't', 'yes']
 
 render_host = os.getenv('RENDER_EXTERNAL_HOSTNAME')
-local_hosts = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+allowed_hosts_env = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost,localhost:1004')
 
-ALLOWED_HOSTS = []
-if render_host:
+ALLOWED_HOSTS = [h.strip() for h in allowed_hosts_env.split(',') if h.strip()]
+if render_host and render_host not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(render_host)
-ALLOWED_HOSTS.extend([host.strip() for host in local_hosts if host.strip()])
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -67,18 +66,10 @@ DATABASES = {
 }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 LANGUAGE_CODE = 'en-us'
