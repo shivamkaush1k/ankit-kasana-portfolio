@@ -1,0 +1,838 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>{{ profile.name }} | {{ profile.title }}</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #1e293b;
+            --accent: #0ea5e9;
+            --bg: #0f172a;
+            --card: rgba(255,255,255,0.06);
+            --border: rgba(255,255,255,0.12);
+            --text: #ffffff;
+            --muted: #cbd5e1;
+            --shadow: 0 20px 45px rgba(0,0,0,0.25);
+            --container: 1180px;
+            --nav-height: 72px;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(37,99,235,0.18), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(14,165,233,0.14), transparent 28%),
+                var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .container {
+            width: min(100% - 2rem, var(--container));
+            margin: 0 auto;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--nav-height);
+            z-index: 1000;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-container {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #fff, #bfdbfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links a {
+            padding: 0.75rem 1rem;
+            border-radius: 999px;
+            color: rgba(255,255,255,0.82);
+            transition: 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+        }
+
+        .hamburger {
+            display: none;
+            background: rgba(255,255,255,0.08);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.1);
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .menu-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s ease;
+            z-index: 998;
+        }
+
+        .menu-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .page-wrapper {
+            height: 100vh;
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+        }
+
+        .section {
+            min-height: 100vh;
+            scroll-snap-align: start;
+            display: flex;
+            align-items: center;
+            padding: calc(var(--nav-height) + 2rem) 0 2rem;
+        }
+
+        .section-card {
+            width: 100%;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(16px);
+        }
+
+        .hero-layout {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .hero {
+            text-align: left;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.75rem 1.1rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.12);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            line-height: 1.05;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            margin-bottom: 0.8rem;
+            background: linear-gradient(135deg, #fff, #dbeafe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            color: rgba(255,255,255,0.88);
+            line-height: 1.8;
+            max-width: 760px;
+            margin-bottom: 2rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7rem;
+            padding: 1rem 1.5rem;
+            border-radius: 999px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #0ea5e9);
+            color: white;
+        }
+
+        .btn-light {
+            background: rgba(255,255,255,0.92);
+            color: #0f172a;
+        }
+
+        .btn:hover {
+            transform: translateY(-4px);
+        }
+
+        .hero-image-box {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .hero-image-box img {
+            width: 100%;
+            height: 360px;
+            object-fit: cover;
+            border-radius: 22px;
+        }
+
+        .hero-image-placeholder {
+            width: 100%;
+            height: 360px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 22px;
+            background: rgba(255,255,255,0.06);
+            font-size: 4rem;
+            color: #93c5fd;
+        }
+
+        .section-title {
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-weight: 800;
+            margin-bottom: 0.8rem;
+        }
+
+        .section-subtitle {
+            color: var(--muted);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .about-grid,
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .about-text p,
+        .timeline-item p,
+        .edu-card p,
+        .skill-card p,
+        .info-subtitle {
+            color: var(--muted);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-box,
+        .skill-card,
+        .timeline-item,
+        .edu-card,
+        .contact-info,
+        .contact-box,
+        .hobby-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 1.4rem;
+        }
+
+        .stat-box h3 {
+            font-size: 2rem;
+            margin-bottom: 0.4rem;
+            color: #93c5fd;
+        }
+
+        .stat-box p {
+            color: var(--muted);
+        }
+
+        .skills-grid,
+        .hobbies-grid,
+        .education-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .skill-card i,
+        .hobby-card i {
+            font-size: 1.5rem;
+            color: #93c5fd;
+            margin-bottom: 0.8rem;
+        }
+
+        .skill-card h3,
+        .timeline-top h3,
+        .edu-card h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.15rem;
+        }
+
+        .timeline {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .timeline-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.6rem;
+        }
+
+        .timeline-top span,
+        .edu-year {
+            color: #93c5fd;
+            font-weight: 600;
+        }
+
+        .contact-info,
+        .contact-box {
+            height: 100%;
+        }
+
+        .profile-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #2563eb, #0ea5e9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-links {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .contact-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .contact-card i {
+            width: 46px;
+            height: 46px;
+            min-width: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            background: rgba(37,99,235,0.18);
+        }
+
+        .contact-card span {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin-bottom: 0.2rem;
+        }
+
+        .language-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .language-item {
+            padding: 1rem 1.1rem;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .language-item strong {
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .language-item span {
+            color: var(--muted);
+        }
+
+        @media (max-width: 992px) {
+            .about-grid,
+            .contact-grid,
+            .skills-grid,
+            .education-grid,
+            .hobbies-grid,
+            .hero-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                text-align: center;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                overflow: hidden;
+            }
+
+            .hamburger {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1001;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: calc(var(--nav-height) + 10px);
+                right: 1rem;
+                width: min(260px, calc(100% - 2rem));
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.4rem;
+                padding: 1rem;
+                background: rgba(15, 23, 42, 0.96);
+                border: 1px solid var(--border);
+                border-radius: 20px;
+                box-shadow: var(--shadow);
+                z-index: 999;
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(-10px);
+                transition: 0.3s ease;
+            }
+
+            .nav-links.active {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
+
+            .nav-links a {
+                width: 100%;
+            }
+
+            .section-card {
+                padding: 1.4rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .hero-buttons .btn {
+                width: 100%;
+                max-width: 280px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline-top {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-backdrop" id="menuBackdrop"></div>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="#home" class="logo">{{ profile.name }}</a>
+
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home" class="nav-link active">Home</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#skills" class="nav-link">Skills</a></li>
+                <li><a href="#experience" class="nav-link">Experience</a></li>
+                <li><a href="#education" class="nav-link">Education</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+
+            <button class="hamburger" id="hamburger" aria-label="Toggle Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <main class="page-wrapper" id="pageWrapper">
+
+        <section id="home" class="section">
+            <div class="container">
+                <div class="section-card">
+                    <div class="hero-layout">
+                        <div class="hero">
+                            <div class="hero-badge">
+                                <i class="fas fa-user-tie"></i>
+                                {{ profile.title }}
+                            </div>
+
+                            <h1 class="hero-title">{{ profile.name }}</h1>
+
+                            <p class="hero-subtitle">
+                                {{ profile.subtitle }}
+                            </p>
+
+                            <div class="hero-buttons">
+                                <a href="#contact" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Contact Me
+                                </a>
+
+                                <a href="mailto:{{ profile.email }}" class="btn btn-light">
+                                    <i class="fas fa-envelope"></i>
+                                    Email Me
+                                </a>
+
+                                {% if profile.resume %}
+                                <a href="{{ profile.resume.url }}" class="btn btn-primary" download>
+                                    <i class="fas fa-download"></i>
+                                    Download Resume
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="hero-image-box">
+                            {% if profile.profile_image %}
+                                <img src="{{ profile.profile_image.url }}" alt="{{ profile.name }}">
+                            {% else %}
+                                <div class="hero-image-placeholder">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="section">
+            <div class="container">
+                <div class="section-card">
+                    <h2 class="section-title">About Me</h2>
+                    <p class="section-subtitle">
+                        A motivated professional with practical experience in relationship management, sales support, loan process handling,
+                        team leadership, and client communication.
+                    </p>
+
+                    <div class="about-grid">
+                        <div class="about-text">
+                            <p>{{ profile.about_text_1 }}</p>
+                            {% if profile.about_text_2 %}
+                                <p>{{ profile.about_text_2 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="stats-grid">
+                            <div class="stat-box">
+                                <h3>{{ profile.roles_count }}</h3>
+                                <p>Professional Roles</p>
+                            </div>
+                            <div class="stat-box">
+                                <h3>{{ profile.career_start }}</h3>
+                                <p>Started Career</p>
+                            </div>
+                            <div class="stat-box">
+                                <h3>{{ profile.leadership_text }}</h3>
+                                <p>Leadership Experience</p>
+                            </div>
+                            <div class="stat-box">
+                                <h3>{{ profile.focus_text }}</h3>
+                                <p>Relationship Focus</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills" class="section">
+            <div class="container">
+                <div class="section-card">
+                    <h2 class="section-title">Skills</h2>
+                    <p class="section-subtitle">
+                        Core strengths and professional abilities.
+                    </p>
+
+                    <div class="skills-grid">
+                        {% for skill in skills %}
+                        <div class="skill-card">
+                            <i class="{{ skill.icon }}"></i>
+                            <h3>{{ skill.title }}</h3>
+                            <p>{{ skill.description }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="experience" class="section">
+            <div class="container">
+                <div class="section-card">
+                    <h2 class="section-title">Work Experience</h2>
+                    <p class="section-subtitle">
+                        Professional roles and responsibilities.
+                    </p>
+
+                    <div class="timeline">
+                        {% for experience in experiences %}
+                        <div class="timeline-item">
+                            <div class="timeline-top">
+                                <h3>{{ experience.job_title }}</h3>
+                                <span>{{ experience.company }} | {{ experience.duration }}</span>
+                            </div>
+                            <p>{{ experience.description }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="education" class="section">
+            <div class="container">
+                <div class="section-card">
+                    <h2 class="section-title">Education</h2>
+                    <p class="section-subtitle">
+                        Academic background and qualifications.
+                    </p>
+
+                    <div class="education-grid">
+                        {% for education in educations %}
+                        <div class="edu-card">
+                            <div class="edu-year">{{ education.duration }}</div>
+                            <h3>{{ education.institute }}</h3>
+                            <p>{{ education.course }}</p>
+                            {% if education.description %}
+                                <p>{{ education.description }}</p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="section">
+            <div class="container">
+                <div class="section-card">
+                    <div class="contact-grid">
+                        <div class="contact-info">
+                            <div class="profile-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+
+                            <h2 class="section-title">Contact</h2>
+                            <p class="info-subtitle">
+                                Reach out for job opportunities, business discussions, or professional networking.
+                            </p>
+
+                            <div class="contact-links">
+                                <a href="tel:{{ profile.phone }}" class="contact-card">
+                                    <i class="fas fa-phone"></i>
+                                    <div>
+                                        <span>Phone</span>
+                                        <strong>{{ profile.phone }}</strong>
+                                    </div>
+                                </a>
+
+                                <a href="mailto:{{ profile.email }}" class="contact-card">
+                                    <i class="fas fa-envelope"></i>
+                                    <div>
+                                        <span>Email</span>
+                                        <strong>{{ profile.email }}</strong>
+                                    </div>
+                                </a>
+
+                                {% if profile.linkedin %}
+                                <a href="{{ profile.linkedin }}" target="_blank" rel="noopener" class="contact-card">
+                                    <i class="fab fa-linkedin"></i>
+                                    <div>
+                                        <span>LinkedIn</span>
+                                        <strong>{{ profile.name }}</strong>
+                                    </div>
+                                </a>
+                                <a href="https://wa.me/91{{ profile.phone }}" target="_blank" rel="noopener" class="contact-card">
+                                    <i class="fab fa-whatsapp"></i>
+                                    <div>
+                                        <span>WhatsApp</span>
+                                        <strong>+91 {{ profile.phone }}</strong>
+                                    </div>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="contact-box">
+                            <h2 class="section-title">Languages & Hobbies</h2>
+                            <p class="info-subtitle">
+                                Personal strengths and interests.
+                            </p>
+
+                            <div class="language-list" style="margin-bottom: 1.5rem;">
+                                {% for language in languages %}
+                                <div class="language-item">
+                                    <strong>{{ language.name }}</strong>
+                                    <span>{{ language.level }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="hobbies-grid">
+                                {% for hobby in hobbies %}
+                                <div class="hobby-card">
+                                    <i class="{{ hobby.icon }}"></i>
+                                    <h3>{{ hobby.name }}</h3>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.section');
+        const pageWrapper = document.getElementById('pageWrapper');
+        const hamburger = document.getElementById('hamburger');
+        const navMenu = document.getElementById('navLinks');
+        const menuBackdrop = document.getElementById('menuBackdrop');
+
+        function updateActiveLink() {
+            let current = '';
+
+            sections.forEach(section => {
+                const rect = section.getBoundingClientRect();
+                if (rect.top <= window.innerHeight * 0.35 && rect.bottom >= window.innerHeight * 0.35) {
+                    current = section.id;
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        function closeMenu() {
+            navMenu.classList.remove('active');
+            menuBackdrop.classList.remove('active');
+        }
+
+        hamburger.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            menuBackdrop.classList.toggle('active');
+        });
+
+        menuBackdrop.addEventListener('click', closeMenu);
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                const targetId = this.getAttribute('href');
+                if (targetId.startsWith('#')) {
+                    e.preventDefault();
+                    const target = document.querySelector(targetId);
+                    target.scrollIntoView({ behavior: 'smooth' });
+                    closeMenu();
+                }
+            });
+        });
+
+        pageWrapper.addEventListener('scroll', updateActiveLink);
+        window.addEventListener('load', updateActiveLink);
+    </script>
+</body>
+</html>
