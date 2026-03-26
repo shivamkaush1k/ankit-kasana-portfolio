@@ -12,9 +12,6 @@ class Profile(models.Model):
     email = models.EmailField()
     linkedin = models.URLField(blank=True, null=True)
 
-    profile_image = models.ImageField(upload_to='profile/', blank=True, null=True)
-    resume = models.FileField(upload_to='resume/', blank=True, null=True)
-
     roles_count = models.CharField(max_length=50, blank=True, null=True, default='3+')
     career_start = models.CharField(max_length=50, blank=True, null=True, default='2023')
     leadership_text = models.CharField(max_length=100, blank=True, null=True, default='Team')

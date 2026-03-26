@@ -542,7 +542,6 @@
     </nav>
 
     <main class="page-wrapper" id="pageWrapper">
-
         <section id="home" class="section">
             <div class="container">
                 <div class="section-card">
@@ -570,23 +569,15 @@
                                     Email Me
                                 </a>
 
-                                {% if profile.resume %}
-                                <a href="{{ profile.resume.url }}" class="btn btn-primary" download>
+                                <a href="{% static '/resume/Ankit_Resume.pdf' %}" class="btn btn-primary" download>
                                     <i class="fas fa-download"></i>
                                     Download Resume
                                 </a>
-                                {% endif %}
                             </div>
                         </div>
 
                         <div class="hero-image-box">
-                            {% if profile.profile_image %}
-                                <img src="{{ profile.profile_image.url }}" alt="{{ profile.name }}">
-                            {% else %}
-                                <div class="hero-image-placeholder">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                            {% endif %}
+                            <img src="{% static 'profile/akki-removebg-preview.png' %}" alt="{{ profile.name }}">
                         </div>
                     </div>
                 </div>
